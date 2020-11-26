@@ -154,55 +154,60 @@ class Hive:
             
             return pseudo_best, pseudo_worst
     
-    # def cross_over(self, method='rank', n=20):
-    #     best, worst = self.selection(method, n)
-    #     children = []
-    #     for p in range(0, len(best), 2):
-    #         P1 = best[p]
-    #         child1 = P1.genes[0:25]
-    #         random.shuffle(child1)
-    #         child1 = child1 + P1.genes[-25:]
-            
-    #         P2 = best[p+1]
-    #         child2 = P2.genes[0:25]
-    #         random.shuffle(child2)
-    #         child2 = child2 + P2.genes[-25:]
-            
-    #         children.append(child1)
-    #         children.append(child2)
-
-    #     for q in range(0, len(worst)):
-    #         worst[q].genes = children[q]
-        
-    #     return worst
-    
     def cross_over(self, method='rank', n=20):
         best, worst = self.selection(method, n)
         children = []
-        for p in range(0, len(best),2):
-            genome1 = best[p].genes
-            genome2 = best[p+1].genes
-            if genome1[0:25] == genome2[-25]:
-                child1 = genome1[0:25] + genome2[0:25]
-                child2 = genome1[-25:] + genome2[-25:]
-            else:
-                child1 = genome1[0:25] + genome2[-25:]
-                child2 = genome1[-25:] + genome2[0:25]
+        for p in range(0, len(best), 2):
+            P1 = best[p]
+            child1 = P1.genes[0:25]
+            random.shuffle(child1)
+            child1 = child1 + P1.genes[-25:]
+            
+            P2 = best[p+1]
+            child2 = P2.genes[0:25]
+            random.shuffle(child2)
+            child2 = child2 + P2.genes[-25:]
+            
             children.append(child1)
             children.append(child2)
-            
+
         for q in range(0, len(worst)):
             worst[q].genes = children[q]
         
+        del children
+        
         return worst
+    
+    # def cross_over(self, method='rank', n=20):
+    #     best, worst = self.selection(method, n)
+    #     children = []
+    #     for p in range(0, len(best),2):
+    #         genome1 = best[p].genes
+    #         genome2 = best[p+1].genes
+    #         if genome1[0:25] == genome2[-25]:
+    #             child1 = genome1[0:25] + genome2[0:25]
+    #             child2 = genome1[-25:] + genome2[-25:]
+    #         else:
+    #             child1 = genome1[0:25] + genome2[-25:]
+    #             child2 = genome1[-25:] + genome2[0:25]
+    #         children.append(child1)
+    #         children.append(child2)
+            
+    #     for q in range(0, len(worst)):
+    #         worst[q].genes = children[q]
+        
+    #     del children
+        
+    #     return worst
     
     def mutation(self, method='rank', n=20):
         children = self.cross_over()
+        lenght = 10
         for i in range(0, len(children)):
             child = children[i]
-            lenght = 10
             start = random.randint(0, len(child.genes)-lenght)
             mutant = child.genes[start:start+10]
+            random.shuffle(mutant)
             mutant = child.genes[0:start] + mutant + child.genes[start+10:len(child.genes)-1]
             child.genes = mutant
         return children
@@ -221,17 +226,20 @@ class Hive:
                     if self.bees[j].index == children[i].index:
                         self.bees[j].genes = children[i].genes
 
-    def evolution(self, nb_gen=20):
+    def evolution(self, nb_gen=1000):
         i = 0
-        performance = []
+        mutate = False
+        performance = [self.mean_fitness()]
         while i < nb_gen :
+            perf1 = self.mean_fitness() 
+            self.relay(method='rank', mutate = mutate)
+            perf2 = self.mean_fitness() 
             performance.append(self.mean_fitness())
-            if i > 0:         
-                self.relay(method='rank', mutate = True)
+            if abs(perf2 - perf1) <= (perf2*10)/100:
+                mutate = True
             else:
-                self.relay(method='rank', mutate = False)
-            performance.append(self.mean_fitness())
-        
+                mutate = False
+            i = i + 1
         return performance        
     
     def plot_performance(self):
@@ -250,14 +258,9 @@ class Hive:
 if __name__ == '__main__':
     f = Flowerfield()
     h = Hive()
-    h.evolution()
-    #plt.figure(1)
-    #h.plot_performance()
-    #plt.figure(2)
-    #h.plot_best_bee()
+    # plt.figure(1)
+    # h.plot_performance()
+    # plt.figure(2)
+    # h.plot_best_bee()
 
-
-# for g in Killer_B.genes:
-#     for x, y in g:
-#         print(np.sqrt(np.sum(np.power(x, 2))))
     
