@@ -1,1 +1,2 @@
-# miel-et-abeilles
+# Miel et abeilles
+## Algorithme de génétique
