@@ -8,6 +8,7 @@ import pandas as pd
 import random
 import numpy as np
 import copy
+from itertools import filterfalse
 
 import matplotlib.pyplot as plt
 
@@ -28,13 +29,14 @@ class Flowerfield:
         plt.scatter(500, 500, c = 'red', label ='Hive')
         plt.legend()
 
-class Bee(Flowerfield):
+class Bee():
     def __init__(self, index):
         self.index = index
         self.genes = self.pollen_gathering()
         self.score = 0
         
     def pollen_gathering(self):
+        f = Flowerfield()
         genes = random.sample(f.flowers, 50)
         return genes
         
@@ -47,7 +49,7 @@ class Bee(Flowerfield):
             score.append(D)            
         self.score = sum(score)
 
-class Hive:
+class Hive():
     def __init__(self):
         self.bees = [Bee(i) for i in range(100)]
         
@@ -155,72 +157,66 @@ class Hive:
             return pseudo_best, pseudo_worst
     
     def cross_over(self, method='rank', n=20):
+        f = Flowerfield()
         best, worst = self.selection(method, n)
         children = []
         for p in range(0, len(best), 2):
-            P1 = best[p]
-            child1 = P1.genes[0:25]
-            random.shuffle(child1)
-            child1 = child1 + P1.genes[-25:]
-            
-            P2 = best[p+1]
-            child2 = P2.genes[0:25]
-            random.shuffle(child2)
-            child2 = child2 + P2.genes[-25:]
-            
-            children.append(child1)
-            children.append(child2)
+            P1 = best[p].genes
+            P2 = best[p+1].genes
 
+            child1 = P1[0:25]
+            for i in range(0, len(P2)):
+                if P2[i] not in child1:
+                    child1.append(P2[i])
+                
+            child2 = P2[0:25]
+            for i in range(0, len(P1)):
+                if P1[i] not in child2:
+                    child2.append(P1[i])   
+
+            M1 = list(filterfalse(set(child1).__contains__, f.flowers))
+            if len(M1) > 0:
+                print('Missing genes for child 1')
+                child1 = child1 + M1
+                children.append(child1)
+            else:
+                children.append(child1)
+                
+            M2 = list(filterfalse(set(child1).__contains__, f.flowers))
+            if len(M2) > 0:
+                print('Missing genes for child 2')
+                child2 = child2 + M2
+                children.append(child2)
+            else:
+                children.append(child2)
+            
         for q in range(0, len(worst)):
             worst[q].genes = children[q]
-        
+
         del children
-        
-        return worst
-    
-    # def cross_over(self, method='rank', n=20):
-    #     best, worst = self.selection(method, n)
-    #     children = []
-    #     for p in range(0, len(best),2):
-    #         genome1 = best[p].genes
-    #         genome2 = best[p+1].genes
-    #         if genome1[0:25] == genome2[-25]:
-    #             child1 = genome1[0:25] + genome2[0:25]
-    #             child2 = genome1[-25:] + genome2[-25:]
-    #         else:
-    #             child1 = genome1[0:25] + genome2[-25:]
-    #             child2 = genome1[-25:] + genome2[0:25]
-    #         children.append(child1)
-    #         children.append(child2)
             
-    #     for q in range(0, len(worst)):
-    #         worst[q].genes = children[q]
-        
-    #     del children
-        
-    #     return worst
-    
+        return worst
+
     def mutation(self, method='rank', n=20):
         children = self.cross_over()
-        lenght = 10
-        for i in range(0, len(children)):
-            child = children[i]
-            start = random.randint(0, len(child.genes)-lenght)
-            mutant = child.genes[start:start+10]
-            random.shuffle(mutant)
-            mutant = child.genes[0:start] + mutant + child.genes[start+10:len(child.genes)-1]
+        length = 5
+        for child in children:
+            start = random.randint(0, 50-length)
+            part = child.genes[start:start+length]
+            random.shuffle(part)
+            mutant = child.genes[0:start] + part + child.genes[start+length:len(child.genes)]
             child.genes = mutant
         return children
     
     def relay(self, method='rank', n=20, mutate = False):
-        if not mutate :            
-            children = self.cross_over(method, n)
+        if mutate :
+            children = self.mutation(method=method, n=n)
             for i in range(0, len(children)):
                 for j in range(0, len(self.bees)):
                     if self.bees[j].index == children[i].index:
                         self.bees[j].genes = children[i].genes
         else:
-            children = self.mutation(method='rank', n=20)
+            children = self.cross_over(method=method, n=n)
             for i in range(0, len(children)):
                 for j in range(0, len(self.bees)):
                     if self.bees[j].index == children[i].index:
@@ -228,17 +224,17 @@ class Hive:
 
     def evolution(self, nb_gen=1000):
         i = 0
-        mutate = False
+        M = False
         performance = [self.mean_fitness()]
         while i < nb_gen :
             perf1 = self.mean_fitness() 
-            self.relay(method='rank', mutate = mutate)
+            self.relay(method='rank', mutate = M)
             perf2 = self.mean_fitness() 
             performance.append(self.mean_fitness())
-            if abs(perf2 - perf1) <= (perf2*10)/100:
-                mutate = True
+            if abs(perf2 - perf1) < (perf2*5)/100:
+                M = True
             else:
-                mutate = False
+                M = False
             i = i + 1
         return performance        
     
@@ -258,9 +254,13 @@ class Hive:
 if __name__ == '__main__':
     f = Flowerfield()
     h = Hive()
-    # plt.figure(1)
-    # h.plot_performance()
-    # plt.figure(2)
-    # h.plot_best_bee()
+    plt.figure(1)
+    h.plot_performance()
+    plt.figure(2)
+    h.plot_best_bee()
+
+            
+    
+    
 
     
