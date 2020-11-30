@@ -9,8 +9,8 @@ $`|F_2 - F_1| = |x_2-x_1|+|y_2-y_1|`$
 
 Ce score représente la distance parcouru par une abeille d'une fleur à l'autre. Il devra donc être minimisée.
 
-### Selection
-Plusieurs méthodes de séléction d'individus à reproduire ont été testées:
+### Sélection
+Plusieurs méthodes de sélection d'individus à reproduire ont été testées:
 - Méthode aléatoire : tirage aléatoire de 40 abeilles. Une moitié pour être les pseudo meilleures abeilles et l'autre moitié pour être les pseudo pires.
 - Méthode classement : les 20 abeilles avec le meilleur score d'adaptation vont se reproduire, les 20 abeilles avec le pire score d'adaptation seront bannis de la ruche.
 - Méthode tournoi : les abeilles sont tirées aléatoirement de la ruche par pairs de deux. Pour chaque couple, la meilleure des deux pourra se reproduire, l'autre sera bannie.
@@ -26,7 +26,9 @@ Une altération aléatoire du génome des enfants est appliquée. Une séquence 
 
 ### Evolution
 
-Une évolution 
+Il est possible d'observer l'évolution des scores d'adaptation des abeilles au fil des générations. Lorsque les performances stagnent, une mutation doit apparaître.
+
+Les figures ci-dessous montrent les résultats d'évolution de 1000 générations d'abeilles pour une sélection par classement.
 
 ![generations](Plots/mean_fitness_score_variation_for_1000_generations_at_rank.png)
 
