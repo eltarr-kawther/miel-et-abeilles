@@ -1,11 +1,11 @@
 # Miel et abeilles : algorithme de génétique
 
 ### Score d'adaptation(fitness)
-La performance d'une abeille est évaluée par son score d'adapation. Le score d'une abeille est défini comme la norme $L_1$.
+La performance d'une abeille est évaluée par son score d'adapation. Le score d'une abeille est défini comme la norme $`L_1`$.
 
-```math
-$|F_2 - F_1| = |x_2-x_1|+|y_2-y_1|$
-```
+
+$`|F_2 - F_1| = |x_2-x_1|+|y_2-y_1|`$
+
 
 Ce score représente la distance parcouru par une abeille d'une fleur à l'autre. Il devra donc être minimisée.
 
