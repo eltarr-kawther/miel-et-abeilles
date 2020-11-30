@@ -18,12 +18,15 @@ Plusieurs méthodes de séléction d'individus à reproduire ont été testées:
 
 ### Reproduction
 La reproduction des abeilles a été faite comme suit :
-- Enfant 1 : 50% du génome de parent 1 + 50% du génome de parent 2
-- Enfant 2 : 50% du génome de parent 2 + 50% du génome de parent 1
+- Enfant 1 : 50% du génome de parent 1 + 50% du génome de parent 2.
+- Enfant 2 : 50% du génome de parent 2 + 50% du génome de parent 1.
 
 ### Mutation
+Une altération aléatoire du génome des enfants est appliquée. Une séquence de 5 fleurs du génome est mélangée.
 
 ### Evolution
+
+Une évolution 
 
 ![generations](Plots/mean_fitness_score_variation_for_1000_generations_at_rank.png)
 
